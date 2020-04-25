@@ -1,27 +1,89 @@
-const express = require('express');
-const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const app = require('../../app')
+const io = app.io
+// updates the rooms as well
 
-const join = (room, pName) => {
-    let roomN;
-    // if (!rooms.includes(room)) {
-    //     rooms.push(room)
-    // }
-    client.join(room)             
-    io.sockets.adapter.clients([room], function(err, clients){    
-        roomN = clients.length;                         
-        console.log(`${pName} has joined ${room},total clients in ${room}: %d`, clients.length);
-    })    
-    // clearly this is not working
-    // setInterval(()=> {
-    //     client.emit(room, roomN)
-    // }, 1000)
+const join = (client, room, pName, rooms) => {
+    // join room
+    client.join(room)    
+    
+    // when somebody joins, first update their list
+    for (let i = 0; i < rooms.length; i++) {
+        let r = rooms[i];
+        if (r.id === room) {
+            io.sockets.in(room).emit('roomInitial', r.players);    
+        }
+    }        
+
+    // adds their name to a specific room
+    if (pName !== '' ) {
+        let found = false;
+        // find if room exists
+        for (let i = 0; i < rooms.length; i++) {
+            if (rooms[i].id === room) {
+                found = true;
+                rooms[i].players.push(pName);
+                rooms[i].client.push(client.id)  
+                // name of players in specific room
+                io.sockets.in(room).emit('roomInitial', rooms[i].players);                  
+                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                  
+                break;
+            }
+        }
+        // if room doesn't exist 
+        if (found === false) {
+            let role = ['Regular 1', 'Snake', 'Bully 1', 'Bully 2', 'Troublemaker', 'Stalker'];
+            rooms.push({"id": room, "players": [], 'client': [], 'roles': role});
+            rooms[rooms.length-1].players.push(pName);
+            rooms[rooms.length-1].client.push(client.id);
+            io.sockets.in(room).emit('roomPlayers', pName);
+            io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                  
+            console.log(rooms)
+        } 
+    }       
+    // when a person leaves a specific room
+    client.on('disconnect', ()=> {            
+        for (let i = 0; i < rooms.length; i++) {
+            for (let j = 0; j < rooms[i].client.length;j++) {
+                if (rooms[i].client[j] === client.id) {
+                    rooms[i].client.splice(j, 1);
+                    rooms[i].players.splice(j, 1);
+                    io.sockets.in(room).emit('roomInitial', rooms[i].players);                  
+                }
+            }
+        }            
+    })     
+    return rooms;
+}
+
+const leave = (client, room, pName, rooms) => {
+    // when a person leaves a specific room
+    client.leave(room)        
+    // remove from personal array
+    for (let i = 0; i < rooms.length; i++) {
+        for (let j = 0; j < rooms[i].client.length;j++) {
+            if (rooms[i].client[j] === client.id) {
+                rooms[i].client.splice(j, 1);
+                rooms[i].players.splice(j, 1);
+                io.sockets.in(room).emit('roomInitial', rooms[i].players);                  
+            }
+        }
+    }                              
+    return rooms;    
 }
 
 
 
 
 module.exports = {
-    join
+    join,
+    leave
 }
+
+    
+    // it's only removed in my database, 
+
+    // displays person who joined in x room
+    // io.sockets.adapter.clients([room], function(err, clients){              
+    //     console.log(clients)
+    //     console.log(`${pName} has joined ${room},total clients in ${room}: %d`, clients.length);
+    // })            
