@@ -10,7 +10,7 @@ const join = (client, room, pName, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {
-            io.sockets.in(room).emit('roomInitial', r.players);    
+            io.sockets.in(room).emit('roomNames', r.players);    
         }
     }        
 
@@ -23,20 +23,24 @@ const join = (client, room, pName, rooms) => {
                 found = true;
                 rooms[i].players.push(pName);
                 rooms[i].client.push(client.id)  
+                rooms[i].ready.push(true)
                 // name of players in specific room
-                io.sockets.in(room).emit('roomInitial', rooms[i].players);                  
-                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                  
-                break;
+                io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end
+                io.sockets.in(room).emit('roomNames', rooms[i].players);                                  
+                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                 
+                break;                
             }
         }
         // if room doesn't exist 
         if (found === false) {
             let role = ['Regular 1', 'Snake', 'Bully 1', 'Bully 2', 'Troublemaker', 'Stalker'];
-            rooms.push({"id": room, "players": [], 'client': [], 'roles': role});
+            rooms.push({"id": room, "status": "waiting", "players": [], 'client': [], 'roles': role, 'ready': []});
             rooms[rooms.length-1].players.push(pName);
             rooms[rooms.length-1].client.push(client.id);
-            io.sockets.in(room).emit('roomPlayers', pName);
-            io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                  
+            rooms[rooms.length-1].ready.push(false);
+            io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);   
+            io.sockets.in(room).emit('roomNames', rooms[rooms.length-1].players);                              
+            io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                              
             console.log(rooms)
         } 
     }       
@@ -47,7 +51,7 @@ const join = (client, room, pName, rooms) => {
                 if (rooms[i].client[j] === client.id) {
                     rooms[i].client.splice(j, 1);
                     rooms[i].players.splice(j, 1);
-                    io.sockets.in(room).emit('roomInitial', rooms[i].players);                  
+                    io.sockets.in(room).emit('roomNames', rooms[i].players);                  
                 }
             }
         }            
@@ -64,7 +68,7 @@ const leave = (client, room, pName, rooms) => {
             if (rooms[i].client[j] === client.id) {
                 rooms[i].client.splice(j, 1);
                 rooms[i].players.splice(j, 1);
-                io.sockets.in(room).emit('roomInitial', rooms[i].players);                  
+                io.sockets.in(room).emit('roomNames', rooms[i].players);                  
             }
         }
     }                              

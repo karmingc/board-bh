@@ -56,11 +56,13 @@ const start = (client, room, rooms) => {
     // can use the index of it     
     for (let i = 0; i < rooms.length; i++) {
         if (rooms[i].id === room) {
+            rooms[i].status = "started"
             for (let j = 0; j < rooms[i].players.length; j++) {
                 let nPlayers = rooms[i].players.length;
+                // order is important, didn't work if status was after mid
                 io.to(rooms[i].client[j]).emit('setRole', rooms[i].roles[j])
-                io.to(rooms[i].client[j]).emit('start', true)    
-                io.to(rooms[i].client[j]).emit('midRole', rooms[i].roles.slice(nPlayers));                                                                                          
+                io.to(rooms[i].client[j]).emit('status', rooms[i].status);                                                                                          
+                io.to(rooms[i].client[j]).emit('midRole', rooms[i].roles.slice(nPlayers));                                                                                                          
             }
             // emit the remaining 3 roles to be sent to the middle
         }

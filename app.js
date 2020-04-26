@@ -9,6 +9,7 @@ module.exports = {
 const roomsAction = require('./public/components/rooms');
 const roomsRole = require('./public/components/gameplay/setup');
 const roomAnnounce = require('./public/components/gameplay/announce');
+const roomDiscussion = require('./public/components/gameplay/ready');
 
 // joining a specific room
 // rooms are specifically server side
@@ -57,23 +58,42 @@ io.on('connection', client => {
         // give a unique role for everybody in the same room
         // when click on start
         rooms = roomsRole.start(client, room, rooms);        
-        console.log('game has started')  
+        // console.log('game has started')  
     })
 
+    // Announcements
     client.on('Copycat', (room, target, host) => {
         rooms = roomAnnounce.Copycat(room, target, host, rooms);
-        console.log('Copycat unleashed.')
+        // console.log('Copycat unleashed.')
     })
-
     client.on('Bullies', (room)=> {
-        roomAnnounce.Bullies(room, rooms);
-        console.log('Bullies unleashed.')
+        roomAnnounce.Bullies(room, rooms);                
+    })
+    client.on('Lovebirds', (room)=>{
+        roomAnnounce.Lovebirds(room, rooms);        
+    })
+    client.on('Stalker', (room, target, host)=>{
+        roomAnnounce.Stalker(room, target, host, rooms);        
+    })
+    client.on('Snake', (room, target, host) =>{
+        rooms = roomAnnounce.Snake(room, target, host, rooms);        
+    })
+    client.on('Troublemaker', (room, target, target2) => {
+        rooms = roomAnnounce.Troublemaker(room, target, target2, rooms);        
+    })
+    // random view
+    client.on('View', (room, target, host) => {
+        roomAnnounce.View(room, target, host, rooms)        
     })
 
-    client.on('Lovebirds', (room)=>{
-        roomAnnounce.Lovebirds(room, rooms);
-        console.log('Lovebirds unleashed.')
+    // Post-announcement
+    client.on('Discussion', (room, host) => {
+        rooms = roomDiscussion.Ready(room, host, rooms);
     })
+
+
+
+
 
     // update each room the number of players in room
     setInterval(()=> {     
