@@ -11,8 +11,7 @@ const add = (client, room, role, rooms) => {
             } else {
                 rooms[i].roles.push(role);                  
             }            
-            console.log('added role')
-            console.log(rooms[i].roles);
+            console.log('added role')            
             io.in(room).emit('updateRoles', rooms[i].roles);                  
             break;
         }
@@ -27,8 +26,7 @@ const remove = (client, room, role, rooms) =>  {
                     rooms[i].roles.splice(j, 2);
                 } else {
                     rooms[i].roles.splice(j, 1);
-                }
-                console.log(rooms)
+                }                
                 console.log('removed role')
                 io.in(room).emit('updateRoles', rooms[i].roles);                  
                 break;

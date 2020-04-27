@@ -10,6 +10,7 @@ const roomsAction = require('./public/components/rooms');
 const roomsRole = require('./public/components/gameplay/setup');
 const roomAnnounce = require('./public/components/gameplay/announce');
 const roomDiscussion = require('./public/components/gameplay/ready');
+const roomVote = require('./public/components/gameplay/vote');
 
 // joining a specific room
 // rooms are specifically server side
@@ -86,10 +87,26 @@ io.on('connection', client => {
         roomAnnounce.View(room, target, host, rooms)        
     })
 
-    // Post-announcement
-    client.on('Discussion', (room, host) => {
+    // Post-asnnouncement
+    client.on('Ready', (room, host) => {
         rooms = roomDiscussion.Ready(room, host, rooms);
     })
+
+    // Vote
+    client.on('Vote', (room, target, host) => {
+        rooms = roomVote.Receive(room, target, host, rooms);
+    })
+
+    client.on('Reveal', (room) => {
+        roomVote.Reveal(room, rooms)      
+    })
+
+    client.on("Winner", (room) => {
+        roomVote.Winner(room, rooms)
+    })
+
+    // Vote results, send back two things
+    // list of votes + players name, so 
 
 
 
@@ -108,7 +125,7 @@ io.on('connection', client => {
     
     // find the room they left
     client.on('disconnect', () => {
-        console.log('someone has left the client')
+        console.log('someone has left the client')        
     });
 })
 

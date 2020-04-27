@@ -23,10 +23,11 @@ const join = (client, room, pName, rooms) => {
                 found = true;
                 rooms[i].players.push(pName);
                 rooms[i].client.push(client.id)  
-                rooms[i].ready.push(true)
+                rooms[i].ready.push(false);
+                rooms[i].vote.push('');
                 // name of players in specific room
-                io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end
-                io.sockets.in(room).emit('roomNames', rooms[i].players);                                  
+                io.sockets.in(room).emit('roomNames', rooms[i].players);    
+                io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end                                              
                 io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                 
                 break;                
             }
@@ -34,14 +35,14 @@ const join = (client, room, pName, rooms) => {
         // if room doesn't exist 
         if (found === false) {
             let role = ['Regular 1', 'Snake', 'Bully 1', 'Bully 2', 'Troublemaker', 'Stalker'];
-            rooms.push({"id": room, "status": "waiting", "players": [], 'client': [], 'roles': role, 'ready': []});
+            rooms.push({"id": room, "status": "waiting", "players": [], 'client': [], 'roles': role, 'ready': [], "vote": []});
             rooms[rooms.length-1].players.push(pName);
             rooms[rooms.length-1].client.push(client.id);
             rooms[rooms.length-1].ready.push(false);
-            io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);   
+            rooms[rooms.length-1].vote.push('');
             io.sockets.in(room).emit('roomNames', rooms[rooms.length-1].players);                              
-            io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                              
-            console.log(rooms)
+            io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);               
+            io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                                          
         } 
     }       
     // when a person leaves a specific room
@@ -55,7 +56,7 @@ const join = (client, room, pName, rooms) => {
                 }
             }
         }            
-    })     
+    })       
     return rooms;
 }
 

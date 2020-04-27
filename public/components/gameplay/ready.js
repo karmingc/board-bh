@@ -1,10 +1,8 @@
 const main = require('../../../app')
 const io = main.io
-// each user will click
-// if at that client, if it's ready, changed to false
-// if it is false, then change to true;
 
-// focus on changing it to true first
+// ready updates for everybody
+// frontend switches its index to 0, does not affect backend
 const Ready = (room, host, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
@@ -14,10 +12,21 @@ const Ready = (room, host, rooms) => {
                 r.ready[hIndex] = true;
             } else {
                 r.ready[hIndex] = false;
+            }            
+            // update for every            
+            io.in(room).emit('roomReady', r.ready);                      
+            // if every1 is ready, pass to vote
+            let count = 0;
+            for (let j = 0; j < r.ready.length; j++) {                                
+                if (r.ready[j] === true) {
+                    count+=1;                    
+                    if (count === r.ready.length) {
+                        r.status = "vote"
+                        io.to(r.id).emit('status', r.status);  
+                        console.log('everybody is ready!')
+                    }
+                }                
             }
-            console.log(r.ready);
-            // update for every
-            io.in(room).emit('roomReady', r.ready);                  
         }
     }
     return rooms;

@@ -22,8 +22,7 @@ const Copycat = (room, target, host, rooms) => {
                 io.to(r.client[hIndex]).emit('updateRole', r.roles[hIndex]);                                                                                          
             }            
         }
-    }
-    console.log(rooms);
+    }    
     return rooms;
 }
 
@@ -146,11 +145,10 @@ const Troublemaker = (room, target, target2, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         let temp;
-        if (r.id === room) {
-            console.log(r.roles)
+        if (r.id === room) {            
             let tIndex = r.players.indexOf(target)
             let t2Index = r.players.indexOf(target2)
-            if (r.roles[tIndex] === "Irregular" || r.roles[hIndex] === "Irregular") {
+            if (r.roles[tIndex] === "Irregular" || r.roles[t2Index] === "Irregular") {
                 io.to(r.client[tIndex]).emit('updateRole', r.roles[tIndex]);
                 io.to(r.client[t2Index]).emit('updateRole', r.roles[t2Index]);                                                                                                                                                                                                                
             } else {
@@ -161,8 +159,7 @@ const Troublemaker = (room, target, target2, rooms) => {
                 io.to(r.client[tIndex]).emit('updateRole', r.roles[tIndex]);
                 io.to(r.client[t2Index]).emit('updateRole', r.roles[t2Index]);                                                                                                                                                                                                                
             }            
-            // take on the role of target
-            console.log(r.roles)
+            // take on the role of target            
         }
     }    
     return rooms;     
