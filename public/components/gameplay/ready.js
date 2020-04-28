@@ -22,7 +22,7 @@ const Ready = (room, host, rooms) => {
                     count+=1;                    
                     if (count === r.ready.length) {
                         r.status = "vote"
-                        io.to(r.id).emit('status', r.status);  
+                        io.to(r.id).emit('roomStatus', r.status);  
                         console.log('everybody is ready!')
                     }
                 }                

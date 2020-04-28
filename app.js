@@ -7,7 +7,7 @@ module.exports = {
 }
 
 const roomsAction = require('./public/components/rooms');
-const roomsRole = require('./public/components/gameplay/setup');
+const roomSetup = require('./public/components/gameplay/setup');
 const roomAnnounce = require('./public/components/gameplay/announce');
 const roomDiscussion = require('./public/components/gameplay/ready');
 const roomVote = require('./public/components/gameplay/vote');
@@ -36,30 +36,33 @@ io.on('connection', client => {
 
     // players join a specific room 
     client.on('join', (room, pName)=>{
-        rooms = roomsAction.join(client, room, pName, rooms)
-        console.log(`${pName} has joined room: ${room}`);            
+        rooms = roomsAction.join(client, room, pName, rooms)                
     }) 
     // leave room
-    client.on('leave', (room, pName)=> {
-       rooms = roomsAction.leave(client, room, pName, rooms);
-       console.log(`${pName} has left room: ${room}`);       
+    client.on('leave', (room)=> {
+       rooms = roomsAction.leave(client, room,rooms);       
     })        
+    // just viewing
+    client.on('view', (room)=>{
+        roomsAction.view(client, room, rooms)
+    })
+
     // adding roles to specific room + update 4 every1
     client.on('addRole', (room, role) => {
-        rooms = roomsRole.add(client, room, role, rooms);
-        console.log(`add ${role} from ${room}`);
+        rooms = roomSetup.add(client, room, role, rooms);        
     })
     // remove roles to specific room + update 4 every1
     client.on('removeRole', (room, role) => {
-        rooms = roomsRole.remove(client, room, role, rooms);
-        console.log(`removed ${role} from ${room}`);
+        rooms = roomSetup.remove(client, room, role, rooms);        
     })
     // start specific room 
-    client.on('startGame', (room) => {
-        // give a unique role for everybody in the same room
-        // when click on start
-        rooms = roomsRole.start(client, room, rooms);        
-        // console.log('game has started')  
+    client.on('start', (room) => {
+        // give a unique role for everybody in the same room        
+        rooms = roomSetup.start(client, room, rooms);         
+    })
+
+    client.on('restart', (room) => {
+        rooms = roomSetup.restart(room, rooms)
     })
 
     // Announcements
@@ -124,8 +127,25 @@ io.on('connection', client => {
     },1000)
     
     // find the room they left
-    client.on('disconnect', () => {
-        console.log('someone has left the client')        
+    client.on('disconnect', () => {                
+        console.log('someone has left the client')     
+        for (let i = 0; i < rooms.length; i++) {
+            let r = rooms[i]
+            for (let j = 0; j < r.client.length; j++) {
+                if (r.client[j] === client.id) {
+                    r.client.splice(j, 1);                        
+                    r.players.splice(j, 1);
+                    r.ready.splice(j, 1);
+                    r.vote.splice(j, 1);
+                    io.sockets.in(r.id).emit('roomNames', r.players);                         
+                    io.to(r.client[0]).emit('master', true);  
+                    // delete room if no players
+                    if (r.players.length === 0) {
+                        rooms.splice(i, 1)                            
+                    }                                
+                }
+            }
+        }                               
     });
 })
 

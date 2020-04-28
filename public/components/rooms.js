@@ -21,14 +21,18 @@ const join = (client, room, pName, rooms) => {
         for (let i = 0; i < rooms.length; i++) {
             if (rooms[i].id === room) {
                 found = true;
-                rooms[i].players.push(pName);
-                rooms[i].client.push(client.id)  
-                rooms[i].ready.push(false);
-                rooms[i].vote.push('');
+                // if less than 10, that player will added, 
+                if (rooms[i].players.length < 10) {
+                    rooms[i].players.push(pName);
+                    rooms[i].client.push(client.id)  
+                    rooms[i].ready.push(false);
+                    rooms[i].vote.push('');
+                }
                 // name of players in specific room
                 io.sockets.in(room).emit('roomNames', rooms[i].players);    
-                io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end                                              
-                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                 
+                // io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end                                              
+                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                                                                   
+                console.log(rooms)
                 break;                
             }
         }
@@ -41,47 +45,69 @@ const join = (client, room, pName, rooms) => {
             rooms[rooms.length-1].ready.push(false);
             rooms[rooms.length-1].vote.push('');
             io.sockets.in(room).emit('roomNames', rooms[rooms.length-1].players);                              
-            io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);               
+            // io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);               
             io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                                          
+            // emit master role
+            io.to(client.id).emit('master', true);                                                   
+            console.log(rooms)
         } 
-    }       
+    }         
     // when a person leaves a specific room
-    client.on('disconnect', ()=> {            
-        for (let i = 0; i < rooms.length; i++) {
-            for (let j = 0; j < rooms[i].client.length;j++) {
-                if (rooms[i].client[j] === client.id) {
-                    rooms[i].client.splice(j, 1);
-                    rooms[i].players.splice(j, 1);
-                    io.sockets.in(room).emit('roomNames', rooms[i].players);                  
-                }
-            }
-        }            
-    })       
+    client.on('disconnect', ()=> {             
+        client.leave(room)             
+        console.log('somebody has left the room')                      
+    })                 
     return rooms;
 }
 
-const leave = (client, room, pName, rooms) => {
-    // when a person leaves a specific room
+const leave = (client, room, rooms) => {
+    // when a person leaves a specific room 
     client.leave(room)        
     // remove from personal array
     for (let i = 0; i < rooms.length; i++) {
-        for (let j = 0; j < rooms[i].client.length;j++) {
-            if (rooms[i].client[j] === client.id) {
-                rooms[i].client.splice(j, 1);
-                rooms[i].players.splice(j, 1);
+        let r = rooms[i]
+        for (let j = 0; j < r.client.length;j++) {
+            if (r.client[j] === client.id) {
+                r.client.splice(j, 1);
+                r.players.splice(j, 1);
+                r.ready.splice(j, 1);
+                    r.vote.splice(j, 1);
                 io.sockets.in(room).emit('roomNames', rooms[i].players);                  
+                io.to(rooms[i].client[0]).emit('master', true);  
+                if (r.players.length === 0) {
+                    rooms.splice(i, 1)                            
+                }  
             }
         }
-    }                              
+    }         
+    console.log('someone left from lobby')    
+    console.log(rooms)                 
     return rooms;    
 }
 
 
-
+const view = (client, room, rooms) => {    
+    client.join(room)
+    for (let i = 0; i < rooms.length; i++) {
+        let r = rooms[i];        
+        if (r.id === room) {
+            io.sockets.adapter.clients([r.id], (err, clients) => {   
+                // array of clients connected to room
+                for (let j = 0; j < clients.length; j++) {                    
+                    if (!r.client.includes(clients[j])) {
+                        io.to(clients[j]).emit('initView', r.players)
+                        console.log(`${clients[j]} is creeping`)
+                    }
+                }                
+            })                          
+            
+        }
+    }        
+}
 
 module.exports = {
     join,
-    leave
+    leave, view
 }
 
     

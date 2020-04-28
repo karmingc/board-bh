@@ -17,8 +17,10 @@ const Receive = (room, target, host, rooms) => {
 const Reveal = (room, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
-        if (r.id === room) {
-            io.in(room).emit('finalRoles', r.roles);   
+        let nPlayers = r.players.length;
+        if (r.id === room) {            
+            io.in(room).emit('finalRoles', r.roles); 
+            io.to(room).emit('midRole', r.roles.slice(nPlayers));                                                                                                            
         }
     }    
 }
@@ -34,8 +36,10 @@ const Winner = (room, rooms) => {
             if (Math.floor(r.players.length/2)+1 > count) {
                 io.in(room).emit('finalWinner', 'bullies + follower');   
             } else {
-                if (role === "Bully 1" || role === "Bully 2" || role === "Follower") {
+                if (role === "Bully 1" || role === "Bully 2") {
                     io.in(room).emit('finalWinner', 'good team!');                     
+                } else if (role === "Follower"){
+                    io.in(room).emit('finalWinner', 'bullies + follower');
                 } else if (role === "Douche") {
                     io.in(room).emit('finalWinner', 'douche!');   
                 } else {

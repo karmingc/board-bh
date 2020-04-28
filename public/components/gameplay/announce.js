@@ -109,16 +109,11 @@ const Snake = (room, target, host, rooms) => {
             let tIndex = r.players.indexOf(target)
             let hIndex = r.players.indexOf(host)
             // take on the role of target
-            if (r.roles[tIndex] === "Irregular" || r.roles[hIndex] === "Irregular") {
-                io.to(r.client[hIndex]).emit('updateRole', r.roles[hIndex]);                                                                                          
-                io.to(r.client[tIndex]).emit('updateRole', r.roles[tIndex]);                                                                                          
-            } else {
+            if (r.roles[tIndex] !== "Irregular") {
                 temp = r.roles[hIndex];
                 r.roles[hIndex] = r.roles[tIndex];
-                r.roles[tIndex] = temp;            
-                io.to(r.client[hIndex]).emit('updateRole', r.roles[hIndex]);                                                                                          
-                io.to(r.client[tIndex]).emit('updateRole', r.roles[tIndex]);                                                                                          
-            }                                    
+                r.roles[tIndex] = temp;                      
+            }                              
         }
     }    
     return rooms; 
@@ -130,9 +125,9 @@ const View = (room, target, host, rooms) => {
         let r = rooms[i];        
         if (r.id === room) {
             let tIndex = r.players.indexOf(target)
-            let hIndex = r.players.indexOf(host)                                                                                                     
+            let hIndex = r.players.indexOf(host)   
             if (r.roles[tIndex] === "Irregular" || r.roles[hIndex] === "Irregular") {
-                io.to(r.client[hIndex]).emit('updateRole', r.roles[hIndex]);                                                                                                                                                                                                    
+                io.to(r.client[hIndex]).emit('newRole', r.roles[hIndex]);                                                                                                                                                                                                    
             } else {
                 io.to(r.client[hIndex]).emit('newRole', r.roles[tIndex]);                                                                                          
             }
@@ -148,18 +143,12 @@ const Troublemaker = (room, target, target2, rooms) => {
         if (r.id === room) {            
             let tIndex = r.players.indexOf(target)
             let t2Index = r.players.indexOf(target2)
-            if (r.roles[tIndex] === "Irregular" || r.roles[t2Index] === "Irregular") {
-                io.to(r.client[tIndex]).emit('updateRole', r.roles[tIndex]);
-                io.to(r.client[t2Index]).emit('updateRole', r.roles[t2Index]);                                                                                                                                                                                                                
-            } else {
+            // do nothing if irregular
+            if (r.roles[tIndex] !== "Irregular" && r.roles[t2Index] !== "Irregular") {
                 temp = r.roles[t2Index];
                 r.roles[t2Index] = r.roles[tIndex];
                 r.roles[tIndex] = temp;            
-                // send it back to appropriate client
-                io.to(r.client[tIndex]).emit('updateRole', r.roles[tIndex]);
-                io.to(r.client[t2Index]).emit('updateRole', r.roles[t2Index]);                                                                                                                                                                                                                
-            }            
-            // take on the role of target            
+            }
         }
     }    
     return rooms;     
