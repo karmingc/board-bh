@@ -29,14 +29,22 @@ const Winner = (room, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {            
-            let voted = Sort(r.vote)                          
-            let count = Cnt(r.vote)[voted]            
+            let voted = Sort(r.vote)       
+            console.log(voted);                   
+            let count = Cnt(r.vote)[voted]    
+            // when there's no vote                 
             let vIndex = r.players.indexOf(voted)            
             let role = r.roles[vIndex];                               
             if (Math.floor(r.players.length/2)+1 > count) {
                 io.in(room).emit('finalWinner', 'bullies + follower');   
             } else {
-                if (role === "Bully 1" || role === "Bully 2") {
+                if (!voted){
+                    if (r.roles.slice(r.players.length).includes("Bully 1") && r.roles.slice(r.players.length).includes("Bully 2")) {
+                        io.in(room).emit('finalWinner', 'good team!');                         
+                    } else {
+                        io.in(room).emit('finalWinner', 'bullies + follower');
+                    }
+                } else if (role === "Bully 1" || role === "Bully 2") {
                     io.in(room).emit('finalWinner', 'good team!');                     
                 } else if (role === "Follower"){
                     io.in(room).emit('finalWinner', 'bullies + follower');
@@ -47,7 +55,8 @@ const Winner = (room, rooms) => {
                 }
             }            
         }
-    }       
+    }    
+    console.log(rooms)   
 }
 
 const Sort = (arr) => {
@@ -58,7 +67,8 @@ const Sort = (arr) => {
     }, {});    
     let sorted = Object.keys(cnts).sort((a,b)=>{
         return cnts[b] - cnts[a];
-    })                
+    })          
+    console.log(sorted)          
     return sorted[0];    
 }
 const Cnt = (arr) => {    

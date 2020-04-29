@@ -10,8 +10,7 @@ const add = (client, room, role, rooms) => {
                 rooms[i].roles.push(role);                      
             } else {
                 rooms[i].roles.push(role);                  
-            }            
-            console.log('added role')            
+            }                                   
             io.in(room).emit('updateRoles', rooms[i].roles);                  
             break;
         }
@@ -27,7 +26,6 @@ const remove = (client, room, role, rooms) =>  {
                 } else {
                     rooms[i].roles.splice(j, 1);
                 }                
-                console.log('removed role')
                 io.in(room).emit('updateRoles', rooms[i].roles);                  
                 break;
             }
@@ -53,29 +51,21 @@ const start = (client, room, rooms) => {
     // emit to every client in the same room their unique roles
     // can use the index of it     
     for (let i = 0; i < rooms.length; i++) {
-        if (rooms[i].id === room) {
-            rooms[i].status = "started"
-            for (let j = 0; j < rooms[i].players.length; j++) {                
-                // io.sockets.adapter.clients([rooms[i].id], (err,clients) => {   
-                //     // array of clients connected to room
-                //     for (let k = 0; k < clients.length; k++) {                    
-                //         io.to(clients[k]).emit('setRole', rooms[i].roles[j])
-                //         io.to(clients[k]).emit('roomStatus', rooms[i].status);    
-                //         // send fake mid roles       
-                //         let mid = ['*', '*', '*']                                                                                
-                //         io.to(clients[k]).emit('midRole', mid);                                                                                                          
-                //     }                
-                // }) 
-                // order is important, didn't work if status was after mid
-                io.to(rooms[i].client[j]).emit('setRole', rooms[i].roles[j])
-                io.to(rooms[i].client[j]).emit('roomStatus', rooms[i].status);    
-                // send fake mid roles       
-                let mid = ['*', '*', '*']                                                                                
-                io.to(rooms[i].client[j]).emit('midRole', mid);                                                                                                          
-            }
-            // emit the remaining 3 roles to be sent to the middle
+        let r = rooms[i];
+        if (r.id === room) {            
+            r.status = "started"            
+            let mid = ['*', '*', '*']    
+            for (let j = 0; j < r.players.length; j++) {                                            
+                // send fake mid roles, so no reveal                                   
+                // send to playing ones, send roles first   
+                io.to(r.client[j]).emit('setRole', r.roles[j])                                    
+            }                     
+            // send to everyone
+            io.sockets.in(room).emit('roomStatus', r.status)                                            
+            io.sockets.in(room).emit('midRole', mid);             
         }
     }  
+    console.log(rooms)
     return rooms;    
 }
 
@@ -96,7 +86,7 @@ const restart = (room, rooms) => {
             }
             r.roles = Role
             r.status = "waiting"
-            io.in(room).emit('roomStatus', r.status);               
+            io.in(room).emit('roomStatus', "restart");               
             io.in(room).emit('updateRoles', r.roles);                                                      
             io.in(room).emit('roomReady', r.ready);   
             io.in(room).emit('voteResults', r.vote);                                 

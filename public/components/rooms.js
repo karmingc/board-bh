@@ -48,8 +48,7 @@ const join = (client, room, pName, rooms) => {
             // io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);               
             io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                                          
             // emit master role
-            io.to(client.id).emit('master', true);                                                   
-            console.log(rooms)
+            io.to(client.id).emit('master', true);                                                               
         } 
     }         
     // when a person leaves a specific room
@@ -93,9 +92,12 @@ const view = (client, room, rooms) => {
         if (r.id === room) {
             io.sockets.adapter.clients([r.id], (err, clients) => {   
                 // array of clients connected to room
-                for (let j = 0; j < clients.length; j++) {                    
+                for (let j = 0; j < clients.length; j++) {  
+                    // if they have not joined the game
+                    // so the ones who are playing aren't affected                  
                     if (!r.client.includes(clients[j])) {
                         io.to(clients[j]).emit('initView', r.players)
+                        io.to(clients[j]).emit('roomStatus', r.status)
                         console.log(`${clients[j]} is creeping`)
                     }
                 }                

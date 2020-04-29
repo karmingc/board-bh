@@ -21,18 +21,22 @@ let rooms = []
 io.on('connection', client => {
 
     // you want to shift this into every room
-    let numb = Math.floor(Math.random() * 10)
-        while (given.includes(numb)) {
-            numb = Math.floor(Math.random() * 10)
-        }    
-    given.push(numb)    
+    // let numb = Math.floor(Math.random() * 10)
+    //     while (given.includes(numb)) {
+    //         numb = Math.floor(Math.random() * 10)
+    //     }    
+    // given.push(numb)    
     // console.log(given)    
-    client.emit('testing', numb)
+    // client.emit('testing', numb)
     // console.log(io.engine.clientsCount + ' of people are connected.')        
-    setInterval(()=> {
-        client.emit('number', io.engine.clientsCount)
-    },1000)
+    // setInterval(()=> {
+    //     client.emit('number', io.engine.clientsCount)
+    // },1000)
 
+    client.on('viewRooms', ()=>{                     
+        io.to(client.id).emit('viewRooms', rooms)
+        console.log(rooms)
+    })
 
     // players join a specific room 
     client.on('join', (room, pName)=>{
@@ -64,7 +68,6 @@ io.on('connection', client => {
     client.on('restart', (room) => {
         rooms = roomSetup.restart(room, rooms)
     })
-
     // Announcements
     client.on('Copycat', (room, target, host) => {
         rooms = roomAnnounce.Copycat(room, target, host, rooms);
@@ -127,8 +130,7 @@ io.on('connection', client => {
     },1000)
     
     // find the room they left
-    client.on('disconnect', () => {                
-        console.log('someone has left the client')     
+    client.on('disconnect', () => {                           
         for (let i = 0; i < rooms.length; i++) {
             let r = rooms[i]
             for (let j = 0; j < r.client.length; j++) {
@@ -145,7 +147,7 @@ io.on('connection', client => {
                     }                                
                 }
             }
-        }                               
+        }                                       
     });
 })
 
