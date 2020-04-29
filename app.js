@@ -29,9 +29,21 @@ io.on('connection', client => {
     // console.log(given)    
     // client.emit('testing', numb)
     // console.log(io.engine.clientsCount + ' of people are connected.')        
-    // setInterval(()=> {
-    //     client.emit('number', io.engine.clientsCount)
-    // },1000)
+    setInterval(()=> {
+        client.emit('online', io.engine.clientsCount)
+    },1000)
+
+
+    // update each room the number of players in room
+    setInterval(()=> {     
+        for (let i = 0; i < rooms.length; i++) {
+            let r = rooms[i];
+            // number of players in specific room
+            io.sockets.adapter.clients([r.id], function(err, clients){                   
+                io.sockets.in(r.id).emit('onlineRoom', clients.length);                                       
+            })                                                                          
+        }              
+    },1000)
 
     client.on('viewRooms', ()=>{                     
         io.to(client.id).emit('viewRooms', rooms)
@@ -40,11 +52,11 @@ io.on('connection', client => {
 
     // players join a specific room 
     client.on('join', (room, pName)=>{
-        rooms = roomsAction.join(client, room, pName, rooms)                
+        rooms = roomsAction.join(client, room, pName, rooms)                       
     }) 
     // leave room
     client.on('leave', (room)=> {
-       rooms = roomsAction.leave(client, room,rooms);       
+       rooms = roomsAction.leave(client, room,rooms);           
     })        
     // just viewing
     client.on('view', (room)=>{
@@ -62,11 +74,11 @@ io.on('connection', client => {
     // start specific room 
     client.on('start', (room) => {
         // give a unique role for everybody in the same room        
-        rooms = roomSetup.start(client, room, rooms);         
+        rooms = roomSetup.start(client, room, rooms);               
     })
 
     client.on('restart', (room) => {
-        rooms = roomSetup.restart(room, rooms)
+        rooms = roomSetup.restart(room, rooms)        
     })
     // Announcements
     client.on('Copycat', (room, target, host) => {
@@ -111,23 +123,6 @@ io.on('connection', client => {
         roomVote.Winner(room, rooms)
     })
 
-    // Vote results, send back two things
-    // list of votes + players name, so 
-
-
-
-
-
-    // update each room the number of players in room
-    setInterval(()=> {     
-        for (let i = 0; i < rooms.length; i++) {
-            let r = rooms[i];
-            // number of players in specific room
-            io.sockets.adapter.clients([r.id], function(err, clients){                   
-                io.sockets.in(r.id).emit('nPlayerR', clients.length);                                       
-            })                                                                          
-        }              
-    },1000)
     
     // find the room they left
     client.on('disconnect', () => {                           

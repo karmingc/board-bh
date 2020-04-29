@@ -31,8 +31,7 @@ const join = (client, room, pName, rooms) => {
                 // name of players in specific room
                 io.sockets.in(room).emit('roomNames', rooms[i].players);    
                 // io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end                                              
-                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                                                                   
-                console.log(rooms)
+                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                                                                                   
                 break;                
             }
         }
@@ -48,14 +47,10 @@ const join = (client, room, pName, rooms) => {
             // io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);               
             io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                                          
             // emit master role
-            io.to(client.id).emit('master', true);                                                               
+            io.to(client.id).emit('master', true);      
+            
         } 
-    }         
-    // when a person leaves a specific room
-    client.on('disconnect', ()=> {             
-        client.leave(room)             
-        console.log('somebody has left the room')                      
-    })                 
+    }                     
     return rooms;
 }
 
@@ -70,7 +65,7 @@ const leave = (client, room, rooms) => {
                 r.client.splice(j, 1);
                 r.players.splice(j, 1);
                 r.ready.splice(j, 1);
-                    r.vote.splice(j, 1);
+                r.vote.splice(j, 1);
                 io.sockets.in(room).emit('roomNames', rooms[i].players);                  
                 io.to(rooms[i].client[0]).emit('master', true);  
                 if (r.players.length === 0) {
@@ -78,9 +73,7 @@ const leave = (client, room, rooms) => {
                 }  
             }
         }
-    }         
-    console.log('someone left from lobby')    
-    console.log(rooms)                 
+    }             
     return rooms;    
 }
 
@@ -97,8 +90,7 @@ const view = (client, room, rooms) => {
                     // so the ones who are playing aren't affected                  
                     if (!r.client.includes(clients[j])) {
                         io.to(clients[j]).emit('initView', r.players)
-                        io.to(clients[j]).emit('roomStatus', r.status)
-                        console.log(`${clients[j]} is creeping`)
+                        io.to(clients[j]).emit('roomStatus', r.status)                        
                     }
                 }                
             })                          
