@@ -149,7 +149,7 @@ io.on('connection', client => {
 
 
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 app.use('/', (req, res) => {
     res.send('yo wsup')
 });
