@@ -50,7 +50,8 @@ const join = (client, room, pName, rooms) => {
             io.to(client.id).emit('master', true);      
             
         } 
-    }                     
+    }   
+    console.log(rooms)                  
     return rooms;
 }
 

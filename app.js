@@ -46,8 +46,7 @@ io.on('connection', client => {
     },1000)
 
     client.on('viewRooms', ()=>{                     
-        io.to(client.id).emit('viewRooms', rooms)
-        console.log(rooms)
+        io.to(client.id).emit('viewRooms', rooms)        
     })
 
     // players join a specific room 

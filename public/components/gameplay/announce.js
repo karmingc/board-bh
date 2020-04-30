@@ -127,9 +127,9 @@ const View = (room, target, host, rooms) => {
             let tIndex = r.players.indexOf(target)
             let hIndex = r.players.indexOf(host)   
             if (r.roles[tIndex] === "Irregular" || r.roles[hIndex] === "Irregular") {
-                io.to(r.client[hIndex]).emit('newRole', r.roles[hIndex]);                                                                                                                                                                                                    
+                io.to(r.client[hIndex]).emit('newRole', 'nope');                                                                                                                                                                                                    
             } else {
-                io.to(r.client[hIndex]).emit('newRole', r.roles[tIndex]);                                                                                          
+                io.to(r.client[hIndex]).emit('newRole', 'nope');                                                                                          
             }
         }
     }    
