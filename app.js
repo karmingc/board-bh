@@ -75,17 +75,20 @@ io.on('connection', client => {
         // give a unique role for everybody in the same room        
         rooms = roomSetup.start(client, room, rooms);               
     })
-
     client.on('restart', (room) => {
-        rooms = roomSetup.restart(room, rooms)        
+        rooms = roomSetup.restart(room, rooms, client)        
     })
     // Announcements
+    client.on("RoleAction", (room) => {
+        rooms = roomAnnounce.RoleAction(client, room, rooms);
+    })
+
     client.on('Copycat', (room, target, host) => {
         rooms = roomAnnounce.Copycat(room, target, host, rooms);
         // console.log('Copycat unleashed.')
     })
-    client.on('Bullies', (room)=> {
-        roomAnnounce.Bullies(room, rooms);                
+    client.on('Ghosts', (room)=> {
+        roomAnnounce.Ghosts(room, rooms);                
     })
     client.on('Lovebirds', (room)=>{
         roomAnnounce.Lovebirds(room, rooms);        
@@ -96,8 +99,8 @@ io.on('connection', client => {
     client.on('Snake', (room, target, host) =>{
         rooms = roomAnnounce.Snake(room, target, host, rooms);        
     })
-    client.on('Troublemaker', (room, target, target2) => {
-        rooms = roomAnnounce.Troublemaker(room, target, target2, rooms);        
+    client.on('Meddler', (room, target, target2) => {
+        rooms = roomAnnounce.Meddler(room, target, target2, rooms);        
     })
     // random view
     client.on('View', (room, target, host) => {

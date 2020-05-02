@@ -36,22 +36,22 @@ const Winner = (room, rooms) => {
             let vIndex = r.players.indexOf(voted)            
             let role = r.roles[vIndex];                               
             if (Math.floor(r.players.length/2)+1 > count) {
-                io.in(room).emit('finalWinner', 'bullies + follower');   
+                io.in(room).emit('finalWinner', 'ghosts + faker');   
             } else {
                 if (!voted){
-                    if (r.roles.slice(r.players.length).includes("Bully 1") && r.roles.slice(r.players.length).includes("Bully 2")) {
+                    if (r.roles.slice(r.players.length).includes("Ghost 1") && r.roles.slice(r.players.length).includes("Ghost 2")) {
                         io.in(room).emit('finalWinner', 'good team!');                         
                     } else {
-                        io.in(room).emit('finalWinner', 'bullies + follower');
+                        io.in(room).emit('finalWinner', 'ghosts + faker');
                     }
-                } else if (role === "Bully 1" || role === "Bully 2") {
+                } else if (role === "Ghost 1" || role === "Ghost 2") {
                     io.in(room).emit('finalWinner', 'good team!');                     
-                } else if (role === "Follower"){
-                    io.in(room).emit('finalWinner', 'bullies + follower');
+                } else if (role === "Faker"){
+                    io.in(room).emit('finalWinner', 'ghosts + faker');
                 } else if (role === "Douche") {
                     io.in(room).emit('finalWinner', 'douche!');   
                 } else {
-                    io.in(room).emit('finalWinner', 'bullies + follower!');   
+                    io.in(room).emit('finalWinner', 'ghosts + faker!');   
                 }
             }            
         }

@@ -72,7 +72,7 @@ const start = (client, room, rooms) => {
 const restart = (room, rooms) => {
     // set roomStatus to waiting
     // reset basic roles
-    let Role = ['Regular 1', 'Snake', 'Bully 1', 'Bully 2', 'Troublemaker', 'Stalker']
+    let Role = ['Regular 1', 'Snake', 'Ghost 1', 'Ghost 2', 'Meddler', 'Stalker']
     // reset ready    
     // reset all vote to empty
     // emit to everybody
@@ -84,6 +84,7 @@ const restart = (room, rooms) => {
                 r.vote[j] = ''
                 
             }
+            // r.order = 0;
             r.roles = Role
             r.status = "waiting"
             io.in(room).emit('roomStatus', "restart");               

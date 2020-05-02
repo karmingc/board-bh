@@ -37,8 +37,11 @@ const join = (client, room, pName, rooms) => {
         }
         // if room doesn't exist 
         if (found === false) {
-            let role = ['Regular 1', 'Snake', 'Bully 1', 'Bully 2', 'Troublemaker', 'Stalker'];
-            rooms.push({"id": room, "status": "waiting", "players": [], 'client': [], 'roles': role, 'ready': [], "vote": []});
+            let role = ['Regular 1', 'Snake', 'Ghost 1', 'Ghost 2', 'Meddler', 'Stalker'];
+            rooms.push({
+                "id": room, "status": "waiting", "players": [], 
+                'client': [], 'roles': role, "ghosts": [], "lovebirds": [], "order": 0, 'ready': [], 
+                "vote": []});
             rooms[rooms.length-1].players.push(pName);
             rooms[rooms.length-1].client.push(client.id);
             rooms[rooms.length-1].ready.push(false);

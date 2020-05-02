@@ -2,7 +2,7 @@ const main = require('../../../app')
 const io = main.io
 // all the roles switching should be here
 
-// copycat, bullies, follower, lovebirds, stalker, snake
+// copycat, ghosts, faker, lovebirds, stalker, snake
 
 // copycat, person can copy the same role of another person
 
@@ -26,28 +26,28 @@ const Copycat = (room, target, host, rooms) => {
     return rooms;
 }
 
-// bullies + follower
-const Bullies = (room, rooms) => {
+// ghosts + faker
+const Ghosts = (room, rooms) => {
     // if not inside the array, send back middle
     // more than one bully 
-    let bullies = [];
+    let ghosts = [];
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {       
-            // add list of bullies      
+            // add list of ghosts      
             for (let k = 0; k < r.roles.length; k++) {
-                if (r.roles[k] === 'Bully 1' || r.roles[k] === 'Bully 2') {
+                if (r.roles[k] === 'Ghost 1' || r.roles[k] === 'Ghost 2') {
                     if (k >= r.players.length) {
-                        bullies.push('Middle')
+                        ghosts.push('Middle')
                     } else {
-                        bullies.push(r.players[k])
+                        ghosts.push(r.players[k])
                     }
                 }
             }            
-            // send the list to the bullies
+            // send the list to the spirit team
             for (let j = 0; j < r.players.length; j++){
-                if (r.roles[j] === 'Bully 1' || r.roles[j] === 'Bully 2' || r.roles[j] === 'Follower') {                    
-                    io.to(r.client[j]).emit('bulliesList', bullies);                                                                                          
+                if (r.roles[j] === 'Ghost 1' || r.roles[j] === 'Ghost 2' || r.roles[j] === 'Faker') {                    
+                    io.to(r.client[j]).emit('ghostsList', ghosts);                                                                                          
                 }
             }
         }
@@ -135,8 +135,8 @@ const View = (room, target, host, rooms) => {
     }    
 }
 
-// troublemaker, change two roles
-const Troublemaker = (room, target, target2, rooms) => { 
+// meddler, change two roles
+const Meddler = (room, target, target2, rooms) => { 
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         let temp;
@@ -154,9 +154,62 @@ const Troublemaker = (room, target, target2, rooms) => {
     return rooms;     
 }
 
+const RoleAction = (client, room, rooms) => {
+    for (let i = 0; i < rooms.length; i++) {
+        let r = rooms[i];
+        if (r.id === room) {
+            for (let j = 0; j < r.players.length; j++) {
+                if (r.client[j] === client.id && r.roles[j] === "Lovebirds (2)") {                    
+                    let required; 
+                    if (!r.lovebirds.includes(client.id)) {
+                        r.lovebirds.push(client.id)
+                        for (let k = 0; k < r.players.length; k++) {
+                            if (r.roles[k] === "Lovebirds") {
+                                required += 1;
+                            }
+                        }
+                        if (required === r.lovebirds.length) {
+                            r.order += 1;
+                            io.in(room).emit('NextRole', r.order);
+                        }
+                    }   
+                    console.log(`lovebirds will increase, curr ${r.order}`)                 
+                } else if (r.client[j] === client.id && (r.roles[j] === "Ghost 1" || r.roles[j] === "Ghost 2")) {                    
+                    let required = 0; 
+                    if (!r.ghosts.includes(client.id)) {
+                        r.ghosts.push(client.id)
+                        for (let k = 0; k < r.players.length; k++) {
+                            if (r.roles[k] === "Ghost 1" || r.roles[k] === "Ghost 2") {
+                                required += 1;
+                            }
+                            console.log(required)
+                        }
+                        if (required === r.ghosts.length) {
+                            console.log(r.ghosts.length)
+                            r.order += 1;
+                            io.in(room).emit('NextRole', r.order);
+                        }                             
+                    }   
+                    console.log(`ghosts will increase, curr ${r.order}`)    
+                } else if (r.client[j] === client.id) {
+                    // only 1 person role
+                    r.order += 1;
+                    io.in(room).emit('NextRole', r.order);
+                    console.log(r.order)      
+                    console.log(`random will increase, curr ${r.order}`)    
+                }                
+            }
+
+        }
+    }
+    console.log('increase!')
+    return rooms;    
+}
+
 module.exports = {
     View,
-    Copycat, Bullies, Lovebirds,
-    Stalker, Snake, Troublemaker
+    Copycat, Ghosts, Lovebirds,
+    Stalker, Snake, Meddler,
+    RoleAction
 
 }
