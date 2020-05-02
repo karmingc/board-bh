@@ -21,9 +21,9 @@ const Ready = (room, host, rooms) => {
                 if (r.ready[j] === true) {
                     count+=1;                    
                     if (count === r.ready.length) {
-                        r.status = "vote"
-                        io.to(r.id).emit('roomStatus', r.status);  
-                        console.log('everybody is ready!')
+                        // previously vote
+                        r.status = "announce"
+                        io.to(r.id).emit('roomStatus', r.status);                          
                     }
                 }                
             }

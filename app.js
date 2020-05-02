@@ -82,6 +82,9 @@ io.on('connection', client => {
     client.on("RoleAction", (room) => {
         rooms = roomAnnounce.RoleAction(client, room, rooms);
     })
+    client.on("NoRoleAction", (room, role) => {
+        rooms = roomAnnounce.NoRoleAction(room, rooms, role)
+    })
 
     client.on('Copycat', (room, target, host) => {
         rooms = roomAnnounce.Copycat(room, target, host, rooms);

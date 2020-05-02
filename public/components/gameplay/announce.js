@@ -181,11 +181,9 @@ const RoleAction = (client, room, rooms) => {
                         for (let k = 0; k < r.players.length; k++) {
                             if (r.roles[k] === "Ghost 1" || r.roles[k] === "Ghost 2") {
                                 required += 1;
-                            }
-                            console.log(required)
+                            }                            
                         }
-                        if (required === r.ghosts.length) {
-                            console.log(r.ghosts.length)
+                        if (required === r.ghosts.length) {                            
                             r.order += 1;
                             io.in(room).emit('NextRole', r.order);
                         }                             
@@ -194,22 +192,46 @@ const RoleAction = (client, room, rooms) => {
                 } else if (r.client[j] === client.id) {
                     // only 1 person role
                     r.order += 1;
-                    io.in(room).emit('NextRole', r.order);
-                    console.log(r.order)      
+                    io.in(room).emit('NextRole', r.order);                      
                     console.log(`random will increase, curr ${r.order}`)    
                 }                
             }
-
+            // do something for middle
         }
-    }
-    console.log('increase!')
+    }    
     return rooms;    
+}
+
+const NoRoleAction = (room, rooms, role) => {    
+    // all clients are sending at the same time
+    for (let i = 0; i < rooms.length; i++) {
+        let r = rooms[i];
+        if (r.id === room) {
+            if (role === "Ghosts" && !r.roles.slice(0, r.players.length).includes("Ghost 1") && !r.roles.slice(0, r.players.length).includes("Ghost 2")) {
+                r.order += 1;
+                setTimeout(()=>{
+                    io.in(room).emit('NextRole', r.order);                
+                }, 10000)    
+                console.log('ghostsssssss')                 
+                console.log(r.order)
+            } else if (r.roles.slice(r.players.length).includes(role)) {
+                r.order += 1;
+                setTimeout(()=>{
+                    io.in(room).emit('NextRole', r.order);                
+                }, 10000)   
+                console.log('nobody is that player')        
+                console.log(r.order)         
+            }
+        }
+        
+    }    
+    return rooms;
 }
 
 module.exports = {
     View,
     Copycat, Ghosts, Lovebirds,
     Stalker, Snake, Meddler,
-    RoleAction
+    RoleAction, NoRoleAction
 
 }

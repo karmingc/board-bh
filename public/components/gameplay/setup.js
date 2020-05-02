@@ -1,5 +1,7 @@
-const main = require('../../../app')
-const io = main.io
+const main = require('../../../app');
+const io = main.io;
+const list = require('../list/characters');
+const orders = list.orders;
 // initial setup for roles in the games
 const add = (client, room, role, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
@@ -62,10 +64,26 @@ const start = (client, room, rooms) => {
             }                     
             // send to everyone
             io.sockets.in(room).emit('roomStatus', r.status)                                            
-            io.sockets.in(room).emit('midRole', mid);             
+            io.sockets.in(room).emit('midRole', mid);  
+            
+            let arr = []
+            for (let i = 0; i < orders.length; i++) {
+                if (orders[i].role === "Ghosts" && (r.roles.includes("Ghost 1") || r.roles.includes("Ghost 2")))  {
+                    arr.push(orders[i].role)                
+                }
+                if (orders[i].role === "Lovebirds" && r.roles.includes("Lovebirds (2)"))  {
+                    arr.push(orders[i].role)
+                }
+                if (r.roles.includes(orders[i].role)) {
+                    arr.push(orders[i].role)
+                }
+            }   
+            r.orderRoles = arr;
+
         }
     }  
-    console.log(rooms)
+    console.log(rooms)               
+    // add order of roles 
     return rooms;    
 }
 
