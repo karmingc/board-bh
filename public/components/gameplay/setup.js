@@ -102,11 +102,17 @@ const restart = (room, rooms) => {
                 r.vote[j] = ''
                 
             }
-            // r.order = 0;
+            
+            // reset room
+            r.status = "waiting"            
             r.roles = Role
-            r.status = "waiting"
+            r.order = 0
+            r.orderRoles = []
+            r.ghosts = []
+            r.lovebirds = []
             io.in(room).emit('roomStatus', "restart");               
-            io.in(room).emit('updateRoles', r.roles);                                                      
+            io.in(room).emit('updateRoles', r.roles);   
+            io.in(room).emit('roomNames', r.players);                                                        
             io.in(room).emit('roomReady', r.ready);   
             io.in(room).emit('voteResults', r.vote);                                 
         }

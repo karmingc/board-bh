@@ -1,12 +1,9 @@
 const main = require('../../../app')
 const io = main.io
+
 // all the roles switching should be here
-
-// copycat, ghosts, faker, lovebirds, stalker, snake
-
-// copycat, person can copy the same role of another person
-
 // everything is in order
+
 const Copycat = (room, target, host, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
@@ -154,52 +151,63 @@ const Meddler = (room, target, target2, rooms) => {
     return rooms;     
 }
 
-const RoleAction = (client, room, rooms) => {
+
+const RoleAction = (client, room, rooms, role) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
-        if (r.id === room) {
-            for (let j = 0; j < r.players.length; j++) {
-                if (r.client[j] === client.id && r.roles[j] === "Lovebirds (2)") {                    
-                    let required; 
-                    if (!r.lovebirds.includes(client.id)) {
-                        r.lovebirds.push(client.id)
-                        for (let k = 0; k < r.players.length; k++) {
-                            if (r.roles[k] === "Lovebirds") {
-                                required += 1;
-                            }
+        if (r.id === room) {            
+            if (role === "Lovebirds (2)") {
+                let required = 0; 
+                if (!r.lovebirds.includes(client.id)) {
+                    r.lovebirds.push(client.id)
+                    for (let k = 0; k < r.players.length; k++) {
+                        if (r.roles[k] === "Lovebirds (2)") {
+                            required += 1;
                         }
-                        if (required === r.lovebirds.length) {
+                    }
+                    if (required === r.lovebirds.length) {
+                        // can't double click
+                        let newOrder = r.order + 1;
+                        if (r.orderRoles[newOrder - 1] === role) {
                             r.order += 1;
-                            io.in(room).emit('NextRole', r.order);
                         }
-                    }   
-                    console.log(`lovebirds will increase, curr ${r.order}`)                 
-                } else if (r.client[j] === client.id && (r.roles[j] === "Ghost 1" || r.roles[j] === "Ghost 2")) {                    
-                    let required = 0; 
-                    if (!r.ghosts.includes(client.id)) {
-                        r.ghosts.push(client.id)
-                        for (let k = 0; k < r.players.length; k++) {
-                            if (r.roles[k] === "Ghost 1" || r.roles[k] === "Ghost 2") {
-                                required += 1;
-                            }                            
-                        }
-                        if (required === r.ghosts.length) {                            
-                            r.order += 1;
-                            io.in(room).emit('NextRole', r.order);
-                        }                             
-                    }   
-                    console.log(`ghosts will increase, curr ${r.order}`)    
-                } else if (r.client[j] === client.id) {
-                    // only 1 person role
-                    r.order += 1;
-                    io.in(room).emit('NextRole', r.order);                      
-                    console.log(`random will increase, curr ${r.order}`)    
+                        io.in(room).emit('NextRole', r.order);
+                    }                        
                 }                
+            } else if (role === "Ghost 1" || role === "Ghost 2") {
+                let required = 0; 
+                if (!r.ghosts.includes(client.id)) {
+                    r.ghosts.push(client.id)
+                    for (let k = 0; k < r.players.length; k++) {
+                        if (r.roles[k] === "Ghost 1" || r.roles[k] === "Ghost 2") {
+                            required += 1;
+                        }                            
+                    }                        
+                    if (required === r.ghosts.length) {  
+                        // can't double click                          
+                        let newOrder = r.order + 1;                            
+                        if (r.orderRoles[newOrder - 1] === "Ghosts") {
+                            r.order += 1;
+                        }                          
+                        io.in(room).emit('NextRole', r.order);
+                    }                     
+                }                  
+            } else {
+                // only 1 person role, troubleshoot for copycat when he copies another role      
+                // can't double click              
+                let newOrder = r.order + 1;                    
+                if (r.orderRoles[newOrder - 1] === role) {
+                    r.order += 1;
+                }
+                io.in(room).emit('NextRole', r.order);                 
             }
-            // do something for middle
+            if (r.order >= r.orderRoles.length) {
+                r.status = "vote"
+                io.in(room).emit('roomStatus', r.status);                                                              
+            } 
         }
-    }    
-    return rooms;    
+    }
+    return rooms;
 }
 
 const NoRoleAction = (room, rooms, role) => {    
@@ -207,24 +215,42 @@ const NoRoleAction = (room, rooms, role) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {
-            if (role === "Ghosts" && !r.roles.slice(0, r.players.length).includes("Ghost 1") && !r.roles.slice(0, r.players.length).includes("Ghost 2")) {
-                r.order += 1;
+            if (role === "Ghosts" 
+            && !r.roles.slice(0, r.players.length).includes("Ghost 1") 
+            && !r.roles.slice(0, r.players.length).includes("Ghost 2") 
+            && (r.roles.includes("Ghost 1") || r.roles.includes("Ghost 2"))) {
+                let newOrder = r.order + 1;
+                if (r.orderRoles[newOrder - 1] === role) {
+                    r.order += 1;
+                }
                 setTimeout(()=>{
                     io.in(room).emit('NextRole', r.order);                
-                }, 10000)    
-                console.log('ghostsssssss')                 
-                console.log(r.order)
+                }, 10000)                                                     
+            } else if (role === "Lovebirds (2)" && r.roles.includes("Lovebirds (2)" && !r.roles.slice(0, r.players.length).includes("Lovebirds (2)"))) {
+                let newOrder = r.order + 1;
+                if (r.orderRoles[newOrder - 1] === role) {
+                    r.order += 1;
+                }
+                setTimeout(()=>{
+                    io.in(room).emit('NextRole', r.order);                
+                }, 10000)  
             } else if (r.roles.slice(r.players.length).includes(role)) {
-                r.order += 1;
+                let newOrder = r.order + 1;
+                if (r.orderRoles[newOrder - 1] === role) {
+                    r.order += 1;
+                }
                 setTimeout(()=>{
                     io.in(room).emit('NextRole', r.order);                
-                }, 10000)   
-                console.log('nobody is that player')        
-                console.log(r.order)         
+                }, 10000)                                             
             }
-        }
-        
-    }    
+            if (r.order >= r.orderRoles.length) {
+                r.status = "vote"
+                setTimeout(()=>{
+                    io.in(room).emit('roomStatus', r.status)
+                }, 10000)
+            }           
+        }        
+    }        
     return rooms;
 }
 

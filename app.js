@@ -79,8 +79,8 @@ io.on('connection', client => {
         rooms = roomSetup.restart(room, rooms, client)        
     })
     // Announcements
-    client.on("RoleAction", (room) => {
-        rooms = roomAnnounce.RoleAction(client, room, rooms);
+    client.on("RoleAction", (room, role) => {
+        rooms = roomAnnounce.RoleAction(client, room, rooms, role);
     })
     client.on("NoRoleAction", (room, role) => {
         rooms = roomAnnounce.NoRoleAction(room, rooms, role)
