@@ -97,8 +97,8 @@ const Stalker = (room, target, host, rooms) => {
     }      
 }
 
-// snake - choose one person to swap cards switch
-const Snake = (room, target, host, rooms) => {    
+// thief - choose one person to swap cards switch
+const Thief = (room, target, host, rooms) => {    
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         let temp;
@@ -116,7 +116,7 @@ const Snake = (room, target, host, rooms) => {
     return rooms; 
 }
 
-// random view authorization, used with snake atm
+// random view authorization, used with thief atm
 const View = (room, target, host, rooms) => {    
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];        
@@ -157,9 +157,9 @@ const RoleAction = (client, room, rooms, role) => {
         let r = rooms[i];
         if (r.id === room) {            
             if (role === "Lovebirds (2)") {
-                let required = 0; 
+                let required = 0;                 
                 if (!r.lovebirds.includes(client.id)) {
-                    r.lovebirds.push(client.id)
+                    r.lovebirds.push(client.id)                    
                     for (let k = 0; k < r.players.length; k++) {
                         if (r.roles[k] === "Lovebirds (2)") {
                             required += 1;
@@ -168,7 +168,7 @@ const RoleAction = (client, room, rooms, role) => {
                     if (required === r.lovebirds.length) {
                         // can't double click
                         let newOrder = r.order + 1;
-                        if (r.orderRoles[newOrder - 1] === role) {
+                        if (r.orderRoles[newOrder - 1] === "Lovebirds") {
                             r.order += 1;
                         }
                         io.in(room).emit('NextRole', r.order);
@@ -212,42 +212,45 @@ const RoleAction = (client, room, rooms, role) => {
 
 const NoRoleAction = (room, rooms, role) => {    
     // all clients are sending at the same time
+    let rnd = Math.floor(Math.random() * 3000) + 4000 + Math.floor(Math.random() * 3000)    
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {
             if (role === "Ghosts" 
             && !r.roles.slice(0, r.players.length).includes("Ghost 1") 
             && !r.roles.slice(0, r.players.length).includes("Ghost 2") 
-            && (r.roles.includes("Ghost 1") || r.roles.includes("Ghost 2"))) {
+            && (r.roles.includes("Ghost 1") || r.roles.includes("Ghost 2"))) {                
+                let newOrder = r.order + 1;
+                if (r.orderRoles[newOrder - 1] === "Ghosts") {                    
+                    r.order += 1;                                                                 
+                }
+                setTimeout(()=>{
+                    io.in(room).emit('NextRole', r.order);                
+                }, rnd)                                                     
+            } else if (role === "Lovebirds" 
+            && r.roles.includes("Lovebirds (2)") 
+            && !r.roles.slice(0, r.players.length).includes("Lovebirds (2)")) {                
+                let newOrder = r.order + 1;
+                if (r.orderRoles[newOrder - 1] === "Lovebirds") {                    
+                    r.order += 1;                    
+                }
+                setTimeout(()=>{
+                    io.in(room).emit('NextRole', r.order);                
+                }, rnd)  
+            } else if (r.roles.slice(r.players.length).includes(role)) { 
                 let newOrder = r.order + 1;
                 if (r.orderRoles[newOrder - 1] === role) {
                     r.order += 1;
                 }
                 setTimeout(()=>{
                     io.in(room).emit('NextRole', r.order);                
-                }, 10000)                                                     
-            } else if (role === "Lovebirds (2)" && r.roles.includes("Lovebirds (2)" && !r.roles.slice(0, r.players.length).includes("Lovebirds (2)"))) {
-                let newOrder = r.order + 1;
-                if (r.orderRoles[newOrder - 1] === role) {
-                    r.order += 1;
-                }
-                setTimeout(()=>{
-                    io.in(room).emit('NextRole', r.order);                
-                }, 10000)  
-            } else if (r.roles.slice(r.players.length).includes(role)) {
-                let newOrder = r.order + 1;
-                if (r.orderRoles[newOrder - 1] === role) {
-                    r.order += 1;
-                }
-                setTimeout(()=>{
-                    io.in(room).emit('NextRole', r.order);                
-                }, 10000)                                             
+                }, rnd)                                                           
             }
             if (r.order >= r.orderRoles.length) {
                 r.status = "vote"
                 setTimeout(()=>{
                     io.in(room).emit('roomStatus', r.status)
-                }, 10000)
+                }, rnd)
             }           
         }        
     }        
@@ -257,7 +260,7 @@ const NoRoleAction = (room, rooms, role) => {
 module.exports = {
     View,
     Copycat, Ghosts, Lovebirds,
-    Stalker, Snake, Meddler,
+    Stalker, Thief, Meddler,
     RoleAction, NoRoleAction
 
 }

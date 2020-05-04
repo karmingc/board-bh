@@ -45,9 +45,14 @@ io.on('connection', client => {
         }              
     },1000)
 
-    client.on('viewRooms', ()=>{                     
-        io.to(client.id).emit('viewRooms', rooms)        
-    })
+
+    setInterval(()=> {     
+        client.emit("viewRooms", rooms)         
+    },1000)
+
+    // client.on('viewRooms', ()=>{                     
+    //     io.to(client.id).emit('viewRooms', rooms)        
+    // })
 
     // players join a specific room 
     client.on('join', (room, pName)=>{
@@ -99,8 +104,8 @@ io.on('connection', client => {
     client.on('Stalker', (room, target, host)=>{
         roomAnnounce.Stalker(room, target, host, rooms);        
     })
-    client.on('Snake', (room, target, host) =>{
-        rooms = roomAnnounce.Snake(room, target, host, rooms);        
+    client.on('Thief', (room, target, host) =>{
+        rooms = roomAnnounce.Thief(room, target, host, rooms);        
     })
     client.on('Meddler', (room, target, target2) => {
         rooms = roomAnnounce.Meddler(room, target, target2, rooms);        

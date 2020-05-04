@@ -50,8 +50,7 @@ const Winner = (room, rooms) => {
             let voted = Sort(r.vote)                   
             let count = Cnt(r.vote)[voted]    
             // when there's no vote                 
-            let vIndex = r.players.indexOf(voted)  
-            console.log(vIndex);          
+            let vIndex = r.players.indexOf(voted)                        
             let role = r.roles[vIndex];                               
             if (Math.floor(r.players.length/2)+1 > count) {
                 io.in(room).emit('finalWinner', 'spirit team!');   
@@ -78,9 +77,8 @@ const Winner = (room, rooms) => {
                 }
             }            
         }
-    }    
-    console.log("winner function has been sent!")
-    console.log(rooms)   
+    }        
+    // console.log(rooms)   
 }
 
 const Sort = (arr) => {
@@ -91,8 +89,7 @@ const Sort = (arr) => {
     }, {});    
     let sorted = Object.keys(cnts).sort((a,b)=>{
         return cnts[b] - cnts[a];
-    })          
-    console.log(sorted)          
+    })                      
     return sorted[0];    
 }
 const Cnt = (arr) => {    

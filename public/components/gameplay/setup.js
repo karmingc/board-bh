@@ -82,15 +82,14 @@ const start = (client, room, rooms) => {
 
         }
     }  
-    console.log(rooms)               
-    // add order of roles 
+    // console.log(rooms)                   
     return rooms;    
 }
 
 const restart = (room, rooms) => {
     // set roomStatus to waiting
     // reset basic roles
-    let Role = ['Regular 1', 'Snake', 'Ghost 1', 'Ghost 2', 'Meddler', 'Stalker']
+    let Role = ['Regular 1', 'Thief', 'Ghost 1', 'Ghost 2', 'Meddler', 'Stalker']
     // reset ready    
     // reset all vote to empty
     // emit to everybody

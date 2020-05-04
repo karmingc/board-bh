@@ -37,7 +37,7 @@ const join = (client, room, pName, rooms) => {
         }
         // if room doesn't exist 
         if (found === false) {
-            let role = ['Regular 1', 'Snake', 'Ghost 1', 'Ghost 2', 'Meddler', 'Stalker'];
+            let role = ['Regular 1', 'Thief', 'Ghost 1', 'Ghost 2', 'Meddler', 'Stalker'];
             rooms.push({
                 "id": room, "status": "waiting", "players": [], 
                 'client': [], 'roles': role, "order": 0, "orderRoles": [], "ghosts": [], "lovebirds": [], 'ready': [], 
