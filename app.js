@@ -61,10 +61,15 @@ io.on('connection', client => {
     // leave room
     client.on('leave', (room)=> {
        rooms = roomsAction.leave(client, room,rooms);           
-    })        
+    })       
+    
     // just viewing
     client.on('view', (room)=>{
         roomsAction.view(client, room, rooms)
+    })
+
+    client.on('kick', (room, target) => {
+        rooms = roomsAction.kick(room, rooms, target)
     })
 
     // adding roles to specific room + update 4 every1

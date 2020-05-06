@@ -53,7 +53,7 @@ const join = (client, room, pName, rooms) => {
             io.to(client.id).emit('master', true);      
             
         } 
-    }                       
+    }                         
     return rooms;
 }
 
@@ -102,8 +102,29 @@ const view = (client, room, rooms) => {
     }        
 }
 
+const kick = (room, rooms, target) => {
+    for (let i = 0; i < rooms.length; i++) {
+        let r = rooms[i];
+        if (r.id === room) {
+            for (let j = 0; j < r.players.length; j++) {
+                if (r.players[j] === target) {
+                    io.to(r.client[j]).emit('kicked', true);
+                    io.sockets.connected[r.client[j]].leave(room);                    
+                    r.client.splice(j, 1);
+                    r.players.splice(j, 1);
+                    r.ready.splice(j, 1);
+                    r.vote.splice(j, 1);
+                    io.sockets.in(room).emit('roomNames', rooms[i].players);                        
+                    
+                }
+            }
+        }
+    }    
+    return rooms;
+}
+
 module.exports = {
-    join,
+    join, kick, 
     leave, view
 }
 

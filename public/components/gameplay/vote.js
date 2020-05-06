@@ -53,27 +53,27 @@ const Winner = (room, rooms) => {
             let vIndex = r.players.indexOf(voted)                        
             let role = r.roles[vIndex];                               
             if (Math.floor(r.players.length/2)+1 > count) {
-                io.in(room).emit('finalWinner', 'spirit team!');   
+                io.in(room).emit('finalWinner', 'Team Ghost!');   
             } else {
                 if (vIndex === -1){
                     if (r.roles.slice(r.players.length).includes("Ghost 1") && r.roles.slice(r.players.length).includes("Ghost 2")) {
                         // if both ghost are inside
-                        io.in(room).emit('finalWinner', 'good team!');                         
+                        io.in(room).emit('finalWinner', 'Team Human!');                         
                     } else if (r.roles.includes("Ghost 1") && !r.roles.includes("Ghost 2") && r.roles.slice(r.players.length).includes("Ghost 1")) {
-                        io.in(room).emit('finalWinner', 'good team!'); 
+                        io.in(room).emit('finalWinner', 'Team Human!'); 
                     } else if (r.roles.includes("Ghost 2") && !r.roles.includes("Ghost 1") && r.roles.slice(r.players.length).includes("Ghost 2")) {
-                        io.in(room).emit('finalWinner', 'good team!'); 
+                        io.in(room).emit('finalWinner', 'Team Human!'); 
                     } else {
-                        io.in(room).emit('finalWinner', 'spirit team!');
+                        io.in(room).emit('finalWinner', 'Team Ghost!');
                     }
                 } else if (role === "Ghost 1" || role === "Ghost 2") {
-                    io.in(room).emit('finalWinner', 'good team!');                     
+                    io.in(room).emit('finalWinner', 'Team Human!');                     
                 } else if (role === "Faker"){
-                    io.in(room).emit('finalWinner', 'spirit team!');
+                    io.in(room).emit('finalWinner', 'Team Ghost!');
                 } else if (role === "Douche") {
-                    io.in(room).emit('finalWinner', 'douche!');   
+                    io.in(room).emit('finalWinner', 'Douche!');   
                 } else {
-                    io.in(room).emit('finalWinner', 'spirit team!');   
+                    io.in(room).emit('finalWinner', 'Team Ghost!');   
                 }
             }            
         }
