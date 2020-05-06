@@ -151,6 +151,19 @@ const Meddler = (room, target, target2, rooms) => {
     return rooms;     
 }
 
+const Clueless = (room, rooms, initHost) =>   {  
+    for (let i = 0; i < rooms.length; i++) {
+        let r = rooms[i];
+        if (r.id === room) {
+            for (let j = 0; j < r.players.length; j++) {
+                if (r.players[j] === initHost) {
+                    io.to(r.client[j]).emit('updateRole', r.roles[j]);    
+                }
+            }
+        }
+    }
+}
+
 
 const RoleAction = (client, room, rooms, role) => {
     for (let i = 0; i < rooms.length; i++) {
@@ -258,7 +271,7 @@ const NoRoleAction = (room, rooms, role) => {
 }
 
 module.exports = {
-    View,
+    View, Clueless, 
     Copycat, Ghosts, Lovebirds,
     Stalker, Thief, Meddler,
     RoleAction, NoRoleAction

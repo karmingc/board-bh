@@ -115,11 +115,15 @@ io.on('connection', client => {
     client.on('Meddler', (room, target, target2) => {
         rooms = roomAnnounce.Meddler(room, target, target2, rooms);        
     })
+
+    client.on('Clueless', (room, initHost) => {
+        roomAnnounce.Clueless(room, rooms, initHost);
+    })
     // random view
     client.on('View', (room, target, host) => {
         roomAnnounce.View(room, target, host, rooms)        
     })
-
+    
     // Post-asnnouncement
     client.on('Ready', (room, host) => {
         rooms = roomDiscussion.Ready(room, host, rooms);
