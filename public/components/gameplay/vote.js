@@ -28,7 +28,7 @@ const Receive = (room, target, host, rooms) => {
                 }
             }
         }          
-    }                 
+    }                  
     return rooms;
 }
 

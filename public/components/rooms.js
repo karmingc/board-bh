@@ -10,7 +10,7 @@ const join = (client, room, pName, rooms) => {
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {
-            io.sockets.in(room).emit('roomNames', r.players);    
+            io.sockets.in(room).emit('roomNames', r.players);                
         }
     }        
 
@@ -27,8 +27,8 @@ const join = (client, room, pName, rooms) => {
                     rooms[i].client.push(client.id)  
                     rooms[i].ready.push(false);
                     rooms[i].vote.push('');
-                }
-                // name of players in specific room
+                }                
+                // name of players in specific room                
                 io.sockets.in(room).emit('roomNames', rooms[i].players);    
                 // io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end                                              
                 io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                                                                                   
@@ -53,7 +53,8 @@ const join = (client, room, pName, rooms) => {
             io.to(client.id).emit('master', true);      
             
         } 
-    }                         
+    }   
+    console.log(rooms);                      
     return rooms;
 }
 
@@ -119,7 +120,7 @@ const kick = (room, rooms, target) => {
                 }
             }
         }
-    }    
+    }        
     return rooms;
 }
 
