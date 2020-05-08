@@ -41,7 +41,7 @@ const join = (client, room, pName, rooms) => {
             rooms.push({
                 "id": room, "status": "waiting", "players": [], 
                 'client': [], 'roles': role, "order": 0, "orderRoles": [], "ghosts": [], "lovebirds": [], 'ready': [], 
-                "vote": []});
+                "vote": [], "chat": []});
             rooms[rooms.length-1].players.push(pName);
             rooms[rooms.length-1].client.push(client.id);
             rooms[rooms.length-1].ready.push(false);

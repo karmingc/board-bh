@@ -11,6 +11,7 @@ const roomSetup = require('./public/components/gameplay/setup');
 const roomAnnounce = require('./public/components/gameplay/announce');
 const roomDiscussion = require('./public/components/gameplay/ready');
 const roomVote = require('./public/components/gameplay/vote');
+const chat = require('./public/components/chat/chat');
 
 // joining a specific room
 // rooms are specifically server side
@@ -140,6 +141,15 @@ io.on('connection', client => {
 
     client.on("Winner", (room) => {
         roomVote.Winner(room, rooms)
+    })
+
+    // chat related
+    client.on("Chat", (room, name) => {
+        chat.getChat(room, rooms, name);
+    })
+
+    client.on("SendChat", (room, name, msg) => {
+        rooms = chat.sendMsg(room, rooms, name, msg);
     })
 
     
