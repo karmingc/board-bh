@@ -19,9 +19,7 @@ const sendMsg = (room, rooms, name, msg) => {
     let h = d.getHours(); 
     let m = d.getMinutes();     
     let min = m < 10? "0" + m: m
-    let time = h + ":" + min;
-    console.log(name)
-    console.log(msg)
+    let time = h + ":" + min;    
     let o = {name: name, msg: msg, time: time};
     console.log(o)
     for (let i = 0; i < rooms.length; i++) {
@@ -30,8 +28,7 @@ const sendMsg = (room, rooms, name, msg) => {
             r.chat.push(o);
             io.sockets.in(room).emit("updateChat", r.chat);
         }
-    }    
-    console.log(rooms);
+    }        
     return rooms;
 }
 

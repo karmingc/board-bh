@@ -27,11 +27,13 @@ const join = (client, room, pName, rooms) => {
                     rooms[i].client.push(client.id)  
                     rooms[i].ready.push(false);
                     rooms[i].vote.push('');
+                    rooms[i].chat.push({name: pName, msg: " joined", time: "null"})
                 }                
                 // name of players in specific room                
                 io.sockets.in(room).emit('roomNames', rooms[i].players);    
                 // io.sockets.in(room).emit('roomReady', rooms[i].ready); // ready prior to players so it doesn't delay in front end                                              
-                io.sockets.in(room).emit('updateRoles', rooms[i].roles);                                                                                                   
+                io.sockets.in(room).emit('updateRoles', rooms[i].roles);   
+                io.sockets.in(room).emit("updateChat", rooms[i].chat);                                                                                                
                 break;                
             }
         }
@@ -46,9 +48,11 @@ const join = (client, room, pName, rooms) => {
             rooms[rooms.length-1].client.push(client.id);
             rooms[rooms.length-1].ready.push(false);
             rooms[rooms.length-1].vote.push('');
+            rooms[rooms.length-1].chat.push({name: pName, msg: " joined", time: "null"})
             io.sockets.in(room).emit('roomNames', rooms[rooms.length-1].players);                              
             // io.sockets.in(room).emit('roomReady', rooms[rooms.length-1].ready);               
             io.sockets.in(room).emit('updateRoles', rooms[rooms.length-1].roles);                                          
+            io.sockets.in(room).emit("updateChat", rooms[rooms.length-1].chat);                                                                                                
             // emit master role
             io.to(client.id).emit('master', true);      
             
