@@ -159,11 +159,13 @@ io.on('connection', client => {
             let r = rooms[i]
             for (let j = 0; j < r.client.length; j++) {
                 if (r.client[j] === client.id) {
+                    r.chat.push({name: r.players[j], msg: " left", time: "null"})
                     r.client.splice(j, 1);                        
                     r.players.splice(j, 1);
                     r.ready.splice(j, 1);
                     r.vote.splice(j, 1);
-                    io.sockets.in(r.id).emit('roomNames', r.players);                         
+                    io.sockets.in(r.id).emit('roomNames', r.players);   
+                    io.sockets.in(r.id).emit("updateChat", rooms[rooms.length-1].chat);                                                                                                                                      
                     io.to(r.client[0]).emit('master', true);  
                     // delete room if no players
                     if (r.players.length === 0) {

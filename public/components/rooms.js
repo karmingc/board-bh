@@ -69,11 +69,13 @@ const leave = (client, room, rooms) => {
         let r = rooms[i]
         for (let j = 0; j < r.client.length;j++) {
             if (r.client[j] === client.id) {
+                r.chat.push({name: r.players[j], msg: " left", time: "null"})
                 r.client.splice(j, 1);
                 r.players.splice(j, 1);
                 r.ready.splice(j, 1);
                 r.vote.splice(j, 1);
-                io.sockets.in(room).emit('roomNames', rooms[i].players);                  
+                io.sockets.in(room).emit('roomNames', rooms[i].players);  
+                io.sockets.in(room).emit("updateChat", rooms[rooms.length-1].chat);                                                                                                                
                 io.to(rooms[i].client[0]).emit('master', true);  
                 if (r.players.length === 0) {
                     rooms.splice(i, 1)                            
@@ -114,11 +116,13 @@ const kick = (room, rooms, target) => {
                 if (r.players[j] === target) {
                     io.to(r.client[j]).emit('kicked', true);
                     io.sockets.connected[r.client[j]].leave(room);                    
+                    r.chat.push({name: r.players[j], msg: " been kicked", time: "null"})
                     r.client.splice(j, 1);
                     r.players.splice(j, 1);
                     r.ready.splice(j, 1);
                     r.vote.splice(j, 1);
                     io.sockets.in(room).emit('roomNames', rooms[i].players);                        
+                    io.sockets.in(room).emit("updateChat", rooms[i].chat);                                                                                                                                      
                     
                 }
             }

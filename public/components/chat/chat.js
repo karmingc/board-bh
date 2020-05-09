@@ -20,8 +20,7 @@ const sendMsg = (room, rooms, name, msg) => {
     let m = d.getMinutes();     
     let min = m < 10? "0" + m: m
     let time = h + ":" + min;    
-    let o = {name: name, msg: msg, time: time};
-    console.log(o)
+    let o = {name: name, msg: msg, time: time};    
     for (let i = 0; i < rooms.length; i++) {
         let r = rooms[i];
         if (r.id === room) {            
