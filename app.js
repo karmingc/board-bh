@@ -12,31 +12,12 @@ const roomAnnounce = require('./public/components/gameplay/announce');
 const roomDiscussion = require('./public/components/gameplay/ready');
 const roomVote = require('./public/components/gameplay/vote');
 const chat = require('./public/components/chat/chat');
+const c = require('./public/components/list/classes')
 
-// joining a specific room
-// rooms are specifically server side
-
-// const c = require('./public/components/list/classes')
-
-let given = []
 let rooms = []
-
-// let newRoom = new c.Room('1', 'karming', 'first', false, '');
-// newRoom.newPlayer('jason', '2', false, '', new c.Message('jason', " joined", "null"))
-// rooms.push(newRoom);
-// console.log(rooms);
 
 io.on('connection', client => {
 
-    // you want to shift this into every room
-    // let numb = Math.floor(Math.random() * 10)
-    //     while (given.includes(numb)) {
-    //         numb = Math.floor(Math.random() * 10)
-    //     }    
-    // given.push(numb)    
-    // console.log(given)    
-    // client.emit('testing', numb)
-    // console.log(io.engine.clientsCount + ' of people are connected.')        
     setInterval(()=> {
         client.emit('online', io.engine.clientsCount)
     },1000)
@@ -57,10 +38,6 @@ io.on('connection', client => {
     setInterval(()=> {     
         client.emit("viewRooms", rooms)         
     },1000)
-
-    // client.on('viewRooms', ()=>{                     
-    //     io.to(client.id).emit('viewRooms', rooms)        
-    // })
 
     // players join a specific room 
     client.on('join', (room, pName)=>{
@@ -166,11 +143,7 @@ io.on('connection', client => {
             let r = rooms[i]
             for (let j = 0; j < r.client.length; j++) {
                 if (r.client[j] === client.id) {
-                    r.chat.push({name: r.players[j], msg: " left", time: "null"})
-                    r.client.splice(j, 1);                        
-                    r.players.splice(j, 1);
-                    r.ready.splice(j, 1);
-                    r.vote.splice(j, 1);
+                    r.removePlayer(j, new c.Message(r.players[j], " left", "null"))                                                                                                                           
                     io.sockets.in(r.id).emit('roomNames', r.players);   
                     io.sockets.in(r.id).emit("updateChat", rooms[rooms.length-1].chat);                                                                                                                                      
                     io.to(r.client[0]).emit('master', true);  
@@ -195,23 +168,4 @@ app.use('/', (req, res) => {
 server.listen(port, () => {
     console.log(`current listening to port ${port}`)
 })
-
-
-// io.on('connection', client => {
-
-//     let numb = Math.floor(Math.random() * 10)
-//     while (given.includes(numb)) {
-//         numb = Math.floor(Math.random() * 10)
-//     }    
-//     given.push(numb)    
-//     console.log(given)
-    
-//     console.log(io.engine.clientsCount + ' of people are connected.')    
-//     client.emit('testing', numb)
-//     setInterval(()=> {
-//         client.emit('number', io.engine.clientsCount)
-//     },1000)
-//     client.on('connect', () => {})    
-//     client.on('disconnect', () => {});
-// })
 
