@@ -16,8 +16,15 @@ const chat = require('./public/components/chat/chat');
 // joining a specific room
 // rooms are specifically server side
 
+// const c = require('./public/components/list/classes')
+
 let given = []
 let rooms = []
+
+// let newRoom = new c.Room('1', 'karming', 'first', false, '');
+// newRoom.newPlayer('jason', '2', false, '', new c.Message('jason', " joined", "null"))
+// rooms.push(newRoom);
+// console.log(rooms);
 
 io.on('connection', client => {
 
@@ -75,16 +82,16 @@ io.on('connection', client => {
 
     // adding roles to specific room + update 4 every1
     client.on('addRole', (room, role) => {
-        rooms = roomSetup.add(client, room, role, rooms);        
+        rooms = roomSetup.add(room, rooms, role);        
     })
     // remove roles to specific room + update 4 every1
     client.on('removeRole', (room, role) => {
-        rooms = roomSetup.remove(client, room, role, rooms);        
+        rooms = roomSetup.remove(room, rooms, role);        
     })
     // start specific room 
     client.on('start', (room) => {
         // give a unique role for everybody in the same room        
-        rooms = roomSetup.start(client, room, rooms);               
+        rooms = roomSetup.start(room, rooms);               
     })
     client.on('restart', (room) => {
         rooms = roomSetup.restart(room, rooms, client)        
