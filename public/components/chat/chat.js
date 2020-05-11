@@ -1,9 +1,9 @@
 const app = require('../../../app')
 const io = app.io
+const c = require('../list/classes')
 
 const getChat = (room, rooms, name) => {
-    for (let i = 0; i < rooms.length; i++) {
-        let r = rooms[i];
+    for (r of rooms) {        
         if (r.id === room) {
             for (let j = 0; j < r.players.length; j++) {
                 if (r.players[j] === name) {
@@ -19,12 +19,10 @@ const sendMsg = (room, rooms, name, msg) => {
     let h = d.getHours(); 
     let m = d.getMinutes();     
     let min = m < 10? "0" + m: m
-    let time = h + ":" + min;    
-    let o = {name: name, msg: msg, time: time};    
-    for (let i = 0; i < rooms.length; i++) {
-        let r = rooms[i];
-        if (r.id === room) {            
-            r.chat.push(o);
+    let time = h + ":" + min;        
+    for (r of rooms) {        
+        if (r.id === room) {     
+            r.addChat(new c.Message(name, msg, time))                   
             io.sockets.in(room).emit("updateChat", r.chat);
         }
     }        

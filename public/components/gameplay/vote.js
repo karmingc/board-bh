@@ -2,8 +2,7 @@ const app = require('../../../app')
 const io = app.io
 // receive from everybody a list of vote
 const Receive = (room, target, host, rooms) => {
-    for (let i = 0; i < rooms.length; i++) {
-        let r = rooms[i];
+    for (r of rooms) {        
         if (r.id === room) {                        
             let hIndex = r.players.indexOf(host);
             r.vote[hIndex] = target;            
@@ -19,7 +18,7 @@ const Receive = (room, target, host, rooms) => {
                     count += 1;
                 }
                 if (count === r.players.length) {
-                    r.status = "results";
+                    r.setStatus('results')                    
                     io.in(room).emit('roomStatus', r.status); 
                     io.in(room).emit('finalRoles', r.roles); 
                     io.to(room).emit('midRole', r.roles.slice(r.players.length));                                                                                                                                
@@ -33,8 +32,7 @@ const Receive = (room, target, host, rooms) => {
 }
 
 const Reveal = (room, rooms) => {
-    for (let i = 0; i < rooms.length; i++) {
-        let r = rooms[i];
+    for (r of rooms) {        
         let nPlayers = r.players.length;
         if (r.id === room) {            
             io.in(room).emit('finalRoles', r.roles); 
@@ -44,8 +42,7 @@ const Reveal = (room, rooms) => {
 }
 
 const Winner = (room, rooms) => {
-    for (let i = 0; i < rooms.length; i++) {
-        let r = rooms[i];
+    for (r of rooms) {        
         if (r.id === room) {            
             let voted = Sort(r.vote)                   
             let count = Cnt(r.vote)[voted]    

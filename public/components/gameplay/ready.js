@@ -3,9 +3,8 @@ const io = main.io
 
 // ready updates for everybody
 // frontend switches its index to 0, does not affect backend
-const Ready = (room, host, rooms) => {
-    for (let i = 0; i < rooms.length; i++) {
-        let r = rooms[i];
+const Ready = (room, rooms, host) => {
+    for (r of rooms) {        
         if (r.id === room) {
             let hIndex = r.players.indexOf(host);
             if (r.ready[hIndex] === false) {
@@ -22,7 +21,7 @@ const Ready = (room, host, rooms) => {
                     count+=1;                    
                     if (count === r.ready.length) {
                         // previously vote
-                        r.status = "announce"
+                        r.setStatus('announce')                        
                         io.to(r.id).emit('roomStatus', r.status);                          
                     }
                 }                

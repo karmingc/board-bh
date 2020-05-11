@@ -134,7 +134,7 @@ io.on('connection', client => {
     
     // Post-asnnouncement
     client.on('Ready', (room, host) => {
-        rooms = roomDiscussion.Ready(room, host, rooms);
+        rooms = roomDiscussion.Ready(room, rooms, host);
     })
 
     // Vote

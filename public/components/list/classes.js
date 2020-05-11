@@ -76,7 +76,7 @@ class Room {
         }
         this.roles = c        
     }
-    // set status of room: setup.js
+    // set status of room: setup.js, announce.js, ready.js, vote.js
     setStatus(status) {
         this.status = status
     }
@@ -84,6 +84,25 @@ class Room {
     setOrderRoles(role) {
         this.orderRoles = [...this.orderRoles, role]
     }
+
+    // announcement simulation: announce.js
+    ghostTeam(player) {
+        this.ghosts = [...this.ghosts, player]
+    }
+
+    lovebirdsTeam(player) {
+        this.lovebirds = [...this.lovebirds, player]
+    }
+
+    // announcement order: announce.js
+    addOrder(){
+        this.order += 1;     
+    }
+    // chat 
+    addChat(msg) {
+        this.chat = [...this.chat, msg]
+    }
+
 }
 
 
