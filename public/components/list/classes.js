@@ -1,3 +1,6 @@
+const main = require('../../../app')
+const io = main.io
+
 class Room {
     constructor(id, playerName, clientID, ready, vote) {
         this.id = id;
@@ -11,7 +14,7 @@ class Room {
         this.lovebirds = []
         this.ready = [ready]
         this.vote = [vote]
-        this.chat = [new Message(playerName, " joined", "null")]
+        this.chat = [new Message(playerName, " joined", "null"), new Message(playerName.slice(0,-5), " is moderator", "announcer")]
     }
     // reset room: setup.js
     resetRoom() {
@@ -101,6 +104,7 @@ class Room {
     // chat 
     addChat(msg) {
         this.chat = [...this.chat, msg]
+        io.sockets.in(this.id).emit("updateChat", this.chat);                                                                                                                
     }
 
 }

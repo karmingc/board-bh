@@ -1,5 +1,6 @@
 const main = require('../../../app')
 const io = main.io
+const c = require('../list/classes')
 
 // ready updates for everybody
 // frontend switches its index to 0, does not affect backend
@@ -22,7 +23,8 @@ const Ready = (room, rooms, host) => {
                     if (count === r.ready.length) {
                         // previously vote
                         r.setStatus('announce')                        
-                        io.to(r.id).emit('roomStatus', r.status);                          
+                        io.to(r.id).emit('roomStatus', r.status);     
+                        r.addChat(new c.Message("Night simulation", " has started. Players will exercise their abilities in order.", "announcer"))                                 
                     }
                 }                
             }

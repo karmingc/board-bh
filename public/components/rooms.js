@@ -56,9 +56,13 @@ const leave = (client, room, rooms) => {
             for (rc of r.client) {
                 if (rc === client.id) {
                     // get index
-                    let idx = r.getIndex('client', rc);                    
+                    let idx = r.getIndex('client', rc);    
+                    let prev = r.players[0];                                    
                     // remove player from Room
                     r.removePlayer(idx, new c.Message(r.players[idx], " left", "null") )                    
+                    if (prev !== r.players[0]) {
+                        r.addChat(new c.Message(r.players[0], " is moderator", "announcer"))
+                    }
                     io.sockets.in(room).emit('roomNames', r.players);  
                     io.sockets.in(room).emit("updateChat", r.chat);                                                                                                                
                     io.to(r.client[0]).emit('master', true);                                     
@@ -101,8 +105,8 @@ const kick = (room, rooms, target) => {
         if (r.id === room) {
             for (rp of r.players) {
                 if (rp === target) {
-                    let idx = r.getIndex('players', rp)
-                    io.to(r.client[idx]).emit('kicked', true);
+                    let idx = r.getIndex('players', rp)                    
+                    io.to(r.client[idx]).emit('kicked', true);                    
                     io.sockets.connected[r.client[idx]].leave(room);  
                     r.removePlayer(idx, new c.Message(rp, " been kicked", "null"))
                     io.sockets.in(room).emit('roomNames', r.players)

@@ -2,6 +2,7 @@ const main = require('../../../app');
 const io = main.io;
 const list = require('../list/characters');
 const orders = list.orders;
+const c = require('../list/classes')
 
 
 // initial setup for roles in the games
@@ -60,8 +61,8 @@ const start = (room, rooms) => {
                 io.to(r.client[j]).emit('setRole', r.roles[j])                                    
             }    
             io.sockets.in(room).emit('roomStatus', r.status)                                            
-            io.sockets.in(room).emit('midRole', mid);  
-            
+            io.sockets.in(room).emit('midRole', mid);              
+            r.addChat(new c.Message("Roles", " have been distributed. Please click ready to start the night simulation.", "announcer"))            
             // set order of game based on roles chosen
             for (order of orders) {
                 if (order.role === "Ghosts" && (r.roles.includes("Ghost 1") || r.roles.includes("Ghost 2")))  {                    
@@ -84,6 +85,7 @@ const restart = (room, rooms) => {
     for (r of rooms) {
         if (r.id === room) {
             r.resetRoom();
+            r.addChat(new c.Message("Game", " has been reset.", "announcer"))            
             io.in(room).emit('roomStatus', "restart");               
             io.in(room).emit('updateRoles', r.roles);   
             io.in(room).emit('roomNames', r.players);                                                        

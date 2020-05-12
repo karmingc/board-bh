@@ -1,6 +1,6 @@
 const main = require('../../../app')
 const io = main.io
-
+const c = require("../list/classes")
 // all the roles switching should be here
 // everything is in order
 
@@ -206,7 +206,8 @@ const RoleAction = (client, room, rooms, role) => {
             }
             if (r.order >= r.orderRoles.length) {
                 r.setStatus('vote')                
-                io.in(room).emit('roomStatus', r.status);                                                              
+                io.in(room).emit('roomStatus', r.status);    
+                r.addChat(new c.Message("Night simulation", " is completed. Please discuss and vote for one person.", "announcer"))                                                                      
             } 
         }
     }    
@@ -252,6 +253,7 @@ const NoRoleAction = (room, rooms, role) => {
                 r.setStatus('vote')                
                 setTimeout(()=>{
                     io.in(room).emit('roomStatus', r.status)
+                    r.addChat(new c.Message("Night simulation", " is completed. Please discuss and vote for one person.", "announcer"))                                                                      
                 }, rnd)
             }           
         }        

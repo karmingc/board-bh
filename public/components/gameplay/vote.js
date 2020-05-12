@@ -1,5 +1,6 @@
 const app = require('../../../app')
 const io = app.io
+const c = require('../list/classes')
 // receive from everybody a list of vote
 const Receive = (room, target, host, rooms) => {
     for (r of rooms) {        
@@ -72,7 +73,8 @@ const Winner = (room, rooms) => {
                 } else {
                     io.in(room).emit('finalWinner', 'Team Ghost!');   
                 }
-            }            
+            }
+            r.addChat(new c.Message("Game", " is completed. Congrats to winning team.", "announcer"))                                                                                  
         }
     }        
     // console.log(rooms)   
