@@ -14,7 +14,7 @@ class Room {
         this.lovebirds = []
         this.ready = [ready]
         this.vote = [vote]
-        this.chat = [new Message(playerName, " joined", "null"), new Message(playerName.slice(0,-5), " is moderator", "announcer")]
+        this.chat = [new Message(playerName, " joined", "null"), new Message(playerName.slice(0,-5), " is game master", "announcer")]
     }
     // reset room: setup.js
     resetRoom() {

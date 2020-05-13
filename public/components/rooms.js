@@ -61,7 +61,7 @@ const leave = (client, room, rooms) => {
                     // remove player from Room
                     r.removePlayer(idx, new c.Message(r.players[idx], " left", "null") )                    
                     if (prev !== r.players[0]) {
-                        r.addChat(new c.Message(r.players[0], " is moderator", "announcer"))
+                        r.addChat(new c.Message(r.players[0], " is game master", "announcer"))
                     }
                     io.sockets.in(room).emit('roomNames', r.players);  
                     io.sockets.in(room).emit("updateChat", r.chat);                                                                                                                
